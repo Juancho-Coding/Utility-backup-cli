@@ -4,11 +4,19 @@
   "description": "Simple cli for some common typical uses during software development",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prestart": "tsc",
+    "start": "node ./dist/test.js",
+    "pretest": "tsc",
+    "test": "nodemon ./src/test.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "typescript": "^5.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.1",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1"
   }
 }
