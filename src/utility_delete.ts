@@ -1,6 +1,7 @@
 import fs from "fs/promises";
+
 export async function deleteFolders(folders: string[]) {
-    if (folders.length <= 0) return { result: true, reason: "" };
+    if (folders.length <= 0) return { numberCompleted: 0, numberRejected: 0 };
     const promises = folders.map((value) => {
         return new Promise<boolean>((resolve, reject) => {
             fs.rmdir(value)
@@ -13,9 +14,11 @@ export async function deleteFolders(folders: string[]) {
         });
     });
     try {
-        const results = await Promise.all(promises);
-        return { result: true, reason: "" };
+        const results = await Promise.allSettled(promises);
+        const numberCompleted = results.filter((value) => value.status === "fulfilled").length;
+        const numberRejected = results.length - numberCompleted;
+        return { numberCompleted, numberRejected };
     } catch (error) {
-        return { result: false, reason: error };
+        return { numberCompleted: 0, numberRejected: folders.length };
     }
 }

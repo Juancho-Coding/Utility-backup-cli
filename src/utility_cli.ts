@@ -64,14 +64,22 @@ function recursiveFindFolder(
 function findFoldersAction(str: string, options: OptionValues) {
     let openFolder: fs.Dir | null = null;
     try {
+        console.log(chalk.blue("Looking for node_modules folders"));
         let folders: string[] = [];
         openFolder = fs.opendirSync(str); // test if folder exists
         recursiveFindFolder(str, "node_modules", folders, 0, 4);
         if (options.force) {
-            deleteFolders(folders);
-            return;
+            deleteFolders(folders).then((value) => {
+                console.log(`Folders deleted: ${value.numberCompleted}`);
+                console.log(`Folders ommited: ${value.numberRejected}`);
+                return;
+            });
         }
         if (options.delete) {
+            if (folders.length < 1) {
+                console.log("There are no node_modules folders to delete");
+                return;
+            }
             inquirer
                 .prompt([
                     {
@@ -82,7 +90,11 @@ function findFoldersAction(str: string, options: OptionValues) {
                     },
                 ])
                 .then((answers: { folders: string[] }) => {
-                    deleteFolders(folders);
+                    deleteFolders(answers.folders).then((value) => {
+                        console.log(`Folders deleted: ${value.numberCompleted}`);
+                        console.log(`Folders ommited: ${value.numberRejected}`);
+                        return;
+                    });
                 })
                 .catch((error) => {
                     console.log(error);
